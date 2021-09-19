@@ -45,6 +45,10 @@ router.get('/all/:teacher_id',async (req,res)=>{
     const {student_id} = req.headers;
     const {code} = req.body;
     const room = await Room.findOne({code:code});
+
+    if(!room){
+        return res.status(200).send({error:"Invalid Class Code Ask your teacher!"})
+    }
     const joined_by = room.joined_by;
 
     if(joined_by.includes(student_id)){
@@ -52,9 +56,7 @@ router.get('/all/:teacher_id',async (req,res)=>{
     }
 
     joined_by.push(student_id)
-    if(!room){
-        return res.status(200).send({error:"Invalid Class Code Ask your teacher!"})
-    }
+    
     Room.updateOne({code:code},{joined_by:joined_by}).then(()=>{
         res.status(200).send({message:"Class Joined Successfully",room})
     }).catch((e)=>{
